@@ -5,5 +5,10 @@ WORKDIR /data
 # Copy your project files
 COPY . /data/
 
-# Run the indexer directly without shell
-CMD ["run", "--allow-env=/data/env", "/data/src/withdrawal_requests.ts", "--status-server-address=0.0.0.0:$PORT"] 
+# Create an entrypoint script
+RUN echo '#!/bin/sh\n\
+exec run --allow-env=/data/env /data/src/withdrawal_requests.ts --status-server-address=0.0.0.0:$PORT' > /entrypoint.sh && \
+    chmod +x /entrypoint.sh
+
+# Use the entrypoint script
+ENTRYPOINT ["/entrypoint.sh"]
