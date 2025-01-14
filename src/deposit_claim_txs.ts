@@ -58,6 +58,7 @@ export default function transform({ header, events }: Block) {
           });
           const vout = event.data[4];
           const caller_address = event.data[5];
+          const target_address = event.data[6];
 
           let transaction_hash = transaction.meta.hash;
           const identifier = `${txid.toString(16)}:${parseInt(vout)}`; // txid:vout
@@ -72,6 +73,7 @@ export default function transform({ header, events }: Block) {
                     rune_id,
                     amount: "0x" + amount.toString(16),
                     caller_address,
+                    target_address,
                     transaction_hash,
                   },
                 },
