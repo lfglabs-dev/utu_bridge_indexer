@@ -8,6 +8,7 @@ export const SELECTOR_KEYS = {
   RUNES_WITHDRAWAL_REQUESTED: BigInt(
     hash.getSelectorFromName("RunesWithdrawalRequested")
   ),
+  RUNES_CLAIMED: BigInt(hash.getSelectorFromName("RunesClaimed")),
 };
 
 export const FINALITY = Deno.env.get("DEFAULT_FINALITY") as string;
