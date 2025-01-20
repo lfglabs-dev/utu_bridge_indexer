@@ -9,7 +9,7 @@ import {
   SELECTOR_KEYS,
   RUNES_CONTRACT,
   MONGO_CONNECTION_STRING,
-  STARTING_BLOCK,
+  WITHDRAWALS_STARTING_BLOCK,
   FINALITY,
   DATABASE_NAME,
 } from "./common/constants.ts";
@@ -28,7 +28,7 @@ const filter = {
 
 export const config = {
   streamUrl: Deno.env.get("STREAM_URL"),
-  startingBlock: Number(STARTING_BLOCK),
+  startingBlock: Number(WITHDRAWALS_STARTING_BLOCK),
   network: "starknet",
   filter,
   sinkType: "mongo",
