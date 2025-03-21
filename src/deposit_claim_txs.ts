@@ -47,7 +47,10 @@ export default function transform({ header, events }: Block) {
 
       switch (key) {
         case SELECTOR_KEYS.RUNES_CLAIMED: {
-          const rune_id = event.keys[1];
+          const rune_id_block = event.keys[1];
+          const rune_id_tx = event.keys[2];
+          const rune_id =
+            parseInt(rune_id_block, 16) + ":" + parseInt(rune_id_tx, 16);
           const amount = uint256.uint256ToBN({
             low: event.data[0],
             high: event.data[1],
