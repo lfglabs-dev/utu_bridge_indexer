@@ -75,7 +75,7 @@ export default function transform({ header, events }: Block) {
                   $set: {
                     identifier,
                     rune_id,
-                    amount: "0x" + amount.toString(16),
+                    amount: amount.toString(),
                     caller_address,
                     target_address,
                     transaction_hash,
