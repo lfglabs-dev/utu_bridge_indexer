@@ -64,7 +64,8 @@ export default function transform({ header, events }: Block) {
           const target_address = event.data[6];
 
           let transaction_hash = transaction.meta.hash;
-          const identifier = `${txid.toString(16)}:${parseInt(vout)}`; // txid:vout
+          const txid_hex = txid.toString(16).padStart(64, "0");
+          const identifier = `${txid_hex}:${parseInt(vout)}`; // txid:vout
 
           return [
             {
