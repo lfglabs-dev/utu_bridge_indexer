@@ -61,14 +61,14 @@ export default function transform({ header, events }: Block) {
             low: event.data[0],
             high: event.data[1],
           });
-          const caller_address = event.data[7];
+          const caller_address = event.data[event.data.length - 1];
 
           // Retrieve target_bitcoin_address
           const data_len = Number(event.data[2]);
           const data = event.data.slice(3, 3 + data_len);
           const myByteArray = {
             data: data,
-            pending_word: Number(event.data[3 + data_len]),
+            pending_word: event.data[3 + data_len],
             pending_word_len: Number(event.data[3 + data_len + 1]),
           };
           const target_bitcoin_address =
