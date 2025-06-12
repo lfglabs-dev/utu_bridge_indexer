@@ -12,6 +12,7 @@ import {
   WITHDRAWALS_STARTING_BLOCK,
   FINALITY,
   DATABASE_NAME,
+  STARKNET_BASE_ASSET_CONTRACT,
 } from "./common/constants.ts";
 
 const filter = {
@@ -20,6 +21,12 @@ const filter = {
     {
       fromAddress: formatFelt(RUNES_CONTRACT),
       keys: [formatFelt(SELECTOR_KEYS.RUNES_WITHDRAWAL_REQUESTED)],
+      includeTransaction: true,
+      includeReceipt: false,
+    },
+    {
+      fromAddress: formatFelt(STARKNET_BASE_ASSET_CONTRACT),
+      keys: [formatFelt(SELECTOR_KEYS.BASE_ASSET_LOCKED)],
       includeTransaction: true,
       includeReceipt: false,
     },
@@ -48,8 +55,11 @@ export default function transform({ header, events }: Block) {
   }
   const timestamp = Math.floor(new Date(header.timestamp).getTime() / 1000);
   const output = events.flatMap(
-    ({ event, transaction }: EventWithTransaction) => {
+    ({ event, transaction }: EventWithTransaction, index: number) => {
       const key = BigInt(event.keys[0]);
+
+      let transaction_hash = transaction.meta.hash;
+      let identifier = `${transaction_hash}:${index}`; // txid:event_index
 
       switch (key) {
         case SELECTOR_KEYS.RUNES_WITHDRAWAL_REQUESTED: {
@@ -74,8 +84,25 @@ export default function transform({ header, events }: Block) {
           const target_bitcoin_address =
             byteArray.stringFromByteArray(myByteArray);
 
-          let transaction_hash = transaction.meta.hash;
-          const identifier = `${transaction_hash}:${event.keys[0]}`; // txid:eventid
+          if (caller_address === STARKNET_BASE_ASSET_CONTRACT) {
+            // we don't add the caller_address we will add it with the next event
+            return [
+              {
+                entity: { identifier },
+                update: [
+                  {
+                    $set: {
+                      identifier,
+                      rune_id,
+                      amount: amount.toString(),
+                      target_bitcoin_address,
+                      transaction_hash,
+                    },
+                  },
+                ],
+              },
+            ];
+          }
 
           return [
             {
@@ -89,6 +116,48 @@ export default function transform({ header, events }: Block) {
                     target_bitcoin_address,
                     caller_address,
                     transaction_hash,
+                  },
+                },
+              ],
+            },
+          ];
+        }
+        case SELECTOR_KEYS.BASE_ASSET_LOCKED: {
+          const caller_address = event.keys[1];
+
+          // Retrieve target_bitcoin_address
+          const data_len = Number(event.data[0]);
+          const data = event.data.slice(1, 1 + data_len);
+          const myByteArray = {
+            data: data,
+            pending_word: event.data[1 + data_len],
+            pending_word_len: Number(event.data[1 + data_len + 1]),
+          };
+          const target_bitcoin_address =
+            byteArray.stringFromByteArray(myByteArray);
+
+          const rune_id_block = event.data[1 + data_len + 2];
+          const rune_id_tx = event.data[1 + data_len + 3];
+          const rune_id =
+            parseInt(rune_id_block, 16) + ":" + parseInt(rune_id_tx, 16);
+          const amount = uint256.uint256ToBN({
+            low: event.data[1 + data_len + 4],
+            high: event.data[1 + data_len + 5],
+          });
+
+          // we set the right caller_address to that entity
+          return [
+            {
+              entity: {
+                transaction_hash,
+                amount: amount.toString(),
+                target_bitcoin_address,
+                rune_id,
+              },
+              update: [
+                {
+                  $set: {
+                    caller_address,
                   },
                 },
               ],

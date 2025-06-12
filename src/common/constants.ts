@@ -9,6 +9,7 @@ export const SELECTOR_KEYS = {
     hash.getSelectorFromName("RunesWithdrawalRequested")
   ),
   RUNES_CLAIMED: BigInt(hash.getSelectorFromName("RunesClaimed")),
+  BASE_ASSET_LOCKED: BigInt(hash.getSelectorFromName("BaseAssetLocked")),
 };
 
 export const FINALITY = Deno.env.get("DEFAULT_FINALITY") as string;
@@ -16,6 +17,9 @@ export const MONGO_CONNECTION_STRING = Deno.env.get(
   "MONGO_CONNECTION_STRING"
 ) as string;
 export const RUNES_CONTRACT = BigInt(Deno.env.get("RUNES_CONTRACT") as string);
+export const STARKNET_BASE_ASSET_CONTRACT = BigInt(
+  Deno.env.get("STARKNET_BASE_ASSET_CONTRACT") as string
+);
 export const DEPOSITS_STARTING_BLOCK = BigInt(
   Deno.env.get("DEPOSITS_STARTING_BLOCK") as string
 );
