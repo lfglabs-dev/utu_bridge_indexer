@@ -3,6 +3,7 @@ import {
   EventWithTransaction,
   uint256,
   byteArray,
+  num,
 } from "./common/deps.ts";
 import {
   formatFelt,
@@ -84,26 +85,6 @@ export default function transform({ header, events }: Block) {
           const target_bitcoin_address =
             byteArray.stringFromByteArray(myByteArray);
 
-          if (caller_address === STARKNET_BASE_ASSET_CONTRACT) {
-            // we don't add the caller_address we will add it with the next event
-            return [
-              {
-                entity: { identifier },
-                update: [
-                  {
-                    $set: {
-                      identifier,
-                      rune_id,
-                      amount: amount.toString(),
-                      target_bitcoin_address,
-                      transaction_hash,
-                    },
-                  },
-                ],
-              },
-            ];
-          }
-
           return [
             {
               entity: { identifier },
@@ -123,7 +104,7 @@ export default function transform({ header, events }: Block) {
           ];
         }
         case SELECTOR_KEYS.BASE_ASSET_LOCKED: {
-          const caller_address = event.keys[1];
+          const proxied_caller_address = event.keys[1];
 
           // Retrieve target_bitcoin_address
           const data_len = Number(event.data[0]);
@@ -153,11 +134,12 @@ export default function transform({ header, events }: Block) {
                 amount: amount.toString(),
                 target_bitcoin_address,
                 rune_id,
+                caller_address: num.toHex64(STARKNET_BASE_ASSET_CONTRACT),
               },
               update: [
                 {
                   $set: {
-                    caller_address,
+                    proxied_caller_address,
                   },
                 },
               ],

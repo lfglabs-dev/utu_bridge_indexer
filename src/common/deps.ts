@@ -3,6 +3,7 @@ export {
   uint256,
   shortString,
   byteArray,
+  num,
 } from "https://esm.sh/starknet@6.16.0";
 export { formatUnits } from "https://esm.sh/viem@1.4";
 export { MongoClient } from "https://deno.land/x/mongo@v0.31.2/mod.ts";
