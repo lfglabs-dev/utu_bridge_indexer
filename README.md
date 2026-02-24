@@ -13,6 +13,13 @@ _Mirror onchain data to a MongoDB collection._
 You must set the `MONGO_CONNECTION_STRING` environment variable to the one
 provided by your MongoDB provider.
 
+## Finality (important)
+
+The indexer supports a `DEFAULT_FINALITY` setting (see `env.example`).
+
+- For production deployments, **do not** use `DATA_STATUS_PENDING`. Pending data can include transactions that later disappear (not accepted / dropped / reorg), which can leave **phantom records** in MongoDB (e.g. withdrawal requests that fail signer verification with “transaction hash not found”).
+- Prefer an accepted/final status (for example `DATA_STATUS_ACCEPTED`) to index only stable chain data.
+
 For developing locally, we provide a `docker-compose.mongo.yml` file that starts
 MongoDB and Mongo Express. Run it with:
 
